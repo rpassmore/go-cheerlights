@@ -6,8 +6,7 @@
 #CMD ["/app/main"]
 
 
-
-FROM golang:latest as builder
+FROM resin/raspberrypi3-golang as builder
 WORKDIR /app
 RUN go get -d -v golang.org/x/net/html  
 COPY app.go .
