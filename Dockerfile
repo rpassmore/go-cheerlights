@@ -6,9 +6,12 @@
 #CMD ["/app/main"]
 
 
-FROM resin/raspberrypi3-golang as builder
+
+FROM golang:latest as builder
+#FROM resin/raspberrypi3-golang as builder
 WORKDIR /app
-RUN go get -d -v golang.org/x/net/html  
+RUN go get -d -v github.com/ikester/blinkt 
+RUN go get -d -v github.com/lucasb-eyer/go-colorful
 COPY app.go .
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .    
 
