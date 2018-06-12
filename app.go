@@ -20,8 +20,12 @@ func main() {
   fmt.Println("Hello, playground")
     
   blinkt := blinkt.NewBlinkt()
-  blinkt.Clear()
-  blinkt.ShowInitialAnim()
+  blinkt.ShowAnimOnStart = true
+  blinkt.CaptureExit = true
+  blinkt.ShowAnimOnExit = true
+  blinkt.ClearOnExit = true
+
+  blinkt.Setup()
 
   //loop forever
   for {
