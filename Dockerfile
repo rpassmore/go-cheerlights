@@ -7,8 +7,11 @@
 
 
 
-FROM golang:latest as builder
-#FROM resin/raspberrypi3-golang as builder
+#FROM golang:latest as builder
+FROM resin/raspberrypi3-golang:latest as builder
+
+ENV INITSYSTEM on
+
 WORKDIR /app
 RUN go get -d -v github.com/ikester/blinkt 
 RUN go get -d -v github.com/lucasb-eyer/go-colorful
