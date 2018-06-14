@@ -43,7 +43,7 @@ func main() {
     theBlinkt.SetAll(int(r), int(g), int(b))
     theBlinkt.Show()
 
-    fmt.Printf("Seting pixel %d to %v, %v, %v", i, c.R, c.G, c.B)
+    log.Printf("Setting pixels to %v, %v, %v", r, g, b)
     time.Sleep(100 * time.Second)
   }
 }
