@@ -26,6 +26,7 @@ func main() {
   theBlinkt.CaptureExit = true
   theBlinkt.ShowAnimOnExit = true
   theBlinkt.ClearOnExit = true
+  theBlinkt.SetBrightness(0.5)
 
   theBlinkt.Setup()
   time.Sleep(30 * time.Second)
@@ -36,9 +37,9 @@ func main() {
     var c, getErr = colorful.Hex(getCheerlightColours())
     if getErr != nil {
       log.Println(getErr)
+      c = colorful.HappyColor()
     }
     var r, g, b = c.RGB255()
-
     //theBlinkt.SetPixel(i, int(c.R), int(c.G), int(c.B))
     theBlinkt.SetAll(int(r), int(g), int(b))
     theBlinkt.Show()
