@@ -1,14 +1,14 @@
 package main
 
 import (
+  "encoding/json"
   "fmt"
-  "time"
-  "github.com/lucasb-eyer/go-colorful"
   "github.com/ikester/blinkt"
+  "github.com/lucasb-eyer/go-colorful"
   "io/ioutil"
   "log"
-  "encoding/json"
   "net/http"
+  "time"
 )
 
 const numPixels = 8
@@ -26,30 +26,32 @@ func main() {
   theBlinkt.CaptureExit = true
   theBlinkt.ShowAnimOnExit = true
   theBlinkt.ClearOnExit = true
-  theBlinkt.SetBrightness(0.5)
+//  theBlinkt.SetBrightness(0.5)
 
   theBlinkt.Setup()
+
+  var prevColour = colorful.FastWarmColor()
+
+  newColour := colorful.HappyColor()
+  prevColour = Blend(theBlinkt, newColour, prevColour)
   time.Sleep(30 * time.Second)
 
   //loop forever
   for {
 
-    var c, getErr = colorful.Hex(getCheerlightColours())
+    var c, getErr = colorful.Hex(GetCheerlightColours())
     if getErr != nil {
       log.Println(getErr)
       c = colorful.HappyColor()
     }
-    var r, g, b = c.RGB255()
-    //theBlinkt.SetPixel(i, int(c.R), int(c.G), int(c.B))
-    theBlinkt.SetAll(int(r), int(g), int(b))
-    theBlinkt.Show()
+    prevColour = Blend(theBlinkt, c, prevColour)
 
-    log.Printf("Setting pixels to %v, %v, %v", r, g, b)
-    time.Sleep(100 * time.Second)
+    //wait before checking for updated colour value
+    time.Sleep(10 * time.Minute)
   }
 }
 
-func getCheerlightColours() (string) {
+func GetCheerlightColours() string {
   var netClient = &http.Client{
     Timeout: time.Second * 3,
   }
@@ -79,9 +81,26 @@ func getCheerlightColours() (string) {
   return result.Colour
 }
 
-//func check(err error) {
-//    if err != nil {
-//        fmt.Println(err)
-//        os.Exit(1)
-//    }
-//}
+/*
+ Set all pixels to the colour c1
+ */
+func SetAll(theBlinkt blinkt.Blinkt, c colorful.Color) {
+  var r, g, b = c.RGB255()
+  log.Printf("Setting pixels to %v, %v, %v", r, g, b)
+  theBlinkt.SetAll(int(r), int(g), int(b))
+  theBlinkt.Show()
+}
+
+/*
+  Blend from colour c1 to colour c2
+ */
+func Blend(theBlink blinkt.Blinkt, c1 colorful.Color, c2 colorful.Color) colorful.Color {
+  steps := 25
+  for i := 0 ; i < steps; i++ {
+    opColour := c1.BlendHsv(c2, float64(i)/float64(steps - 1))
+    SetAll(theBlink, opColour)
+    time.Sleep(250 * time.Millisecond)
+  }
+  return c1
+}
+

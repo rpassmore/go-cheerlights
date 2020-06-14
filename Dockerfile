@@ -12,3 +12,5 @@ FROM scratch
 WORKDIR /root/
 COPY --from=builder /app .
 ENTRYPOINT ["./app"]  
+
+
