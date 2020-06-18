@@ -2,7 +2,6 @@ package main
 
 import (
   "encoding/json"
-  "fmt"
   "github.com/ikester/blinkt"
   "github.com/lucasb-eyer/go-colorful"
   "io/ioutil"
@@ -19,7 +18,7 @@ type cheerlight struct {
 }
 
 func main() {
-  fmt.Println("Cheerlights started")
+  log.Println("Cheerlights started")
 
   theBlinkt := blinkt.NewBlinkt()
   theBlinkt.ShowAnimOnStart = true
@@ -30,21 +29,23 @@ func main() {
 
   theBlinkt.Setup()
 
-  var prevColour = colorful.FastWarmColor()
-
-  newColour := colorful.HappyColor()
-  prevColour = Blend(theBlinkt, newColour, prevColour)
+  var prevColour, getErr = colorful.Hex("#000000")
+  if getErr != nil {
+    log.Println(getErr)
+  }
+  newColour := colorful.FastWarmColor()
+  //newColour := colorful.FastHappyColour()
+  prevColour = Blend(theBlinkt, prevColour, newColour)
   time.Sleep(30 * time.Second)
 
   //loop forever
   for {
-
     var c, getErr = colorful.Hex(GetCheerlightColours())
     if getErr != nil {
       log.Println(getErr)
       c = colorful.HappyColor()
     }
-    prevColour = Blend(theBlinkt, c, prevColour)
+    prevColour = Blend(theBlinkt, prevColour, c)
 
     //wait before checking for updated colour value
     time.Sleep(10 * time.Minute)
@@ -94,13 +95,14 @@ func SetAll(theBlinkt blinkt.Blinkt, c colorful.Color) {
 /*
   Blend from colour c1 to colour c2
  */
-func Blend(theBlink blinkt.Blinkt, c1 colorful.Color, c2 colorful.Color) colorful.Color {
+func Blend(theBlink blinkt.Blinkt, fromColour colorful.Color, toColour colorful.Color) colorful.Color {
+  log.Printf("Blending from %s to %s", fromColour.Hex(), toColour.Hex())
   steps := 25
   for i := 0 ; i < steps; i++ {
-    opColour := c1.BlendHsv(c2, float64(i)/float64(steps - 1))
+    opColour := fromColour.BlendHsv(toColour, float64(i)/float64(steps - 1))
     SetAll(theBlink, opColour)
     time.Sleep(250 * time.Millisecond)
   }
-  return c1
+  return toColour
 }
 
